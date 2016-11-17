@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <title>Emery/Ziza</title>
+        <!-- Babylon.js -->
+        <script src="http://www.babylonjs.com/hand.minified-1.2.js"></script>
+        <script src="http://www.babylonjs.com/cannon.js"></script>
+        <script src="http://www.babylonjs.com/oimo.js"></script>
+        <script src="http://www.babylonjs.com/babylon.js"></script>
+        <script src="http://www.babylonjs.com/physics.js"></script>
+        <style>
+        html, body {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        }
+
+            #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            }
+            </style>
+
+    <script>
+
+        var createScene = function (engine, canvas) {
+        
+            // This creates a basic Babylon Scene object (non-mesh)
+            var scene = new BABYLON.Scene(engine);
+
+            // This creates and positions a free camera (non-mesh)
+            var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -30), scene);
+
+            // This targets the camera to scene origin
+            camera.setTarget(BABYLON.Vector3.Zero());
+
+            // This attaches the camera to the canvas
+            camera.attachControl(canvas, true);
+
+            // light01
+            var light01 = new BABYLON.SpotLight("spot01", new BABYLON.Vector3(125, 120, 125), new BABYLON.Vector3(-1, -2, -1), 1.1, 16, scene);
+            light01.intensity = 1;
+
+            var lightSphere01 = BABYLON.Mesh.CreateSphere("sphere01", 10, 2, scene);
+            lightSphere01.position = light01.position;
+            lightSphere01.material = new BABYLON.StandardMaterial("light01", scene);
+            lightSphere01.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+/*
+            // light02
+            var light02 = new BABYLON.SpotLight("spot02", new BABYLON.Vector3(-125, 120, 125), new BABYLON.Vector3(1, -2, -1), 1.1, 16, scene);
+            light02.intensity = 0.8;
+
+            var lightSphere02 = BABYLON.Mesh.CreateSphere("sphere02", 10, 2, scene);
+            lightSphere02.position = light02.position;
+            lightSphere02.material = new BABYLON.StandardMaterial("light02", scene);
+            lightSphere02.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+
+            // light03
+            var light03 = new BABYLON.SpotLight("spot03", new BABYLON.Vector3(125, 120, -125), new BABYLON.Vector3(-1, -2, 1), 1.1, 16, scene);
+            light03.intensity = 0.8;
+
+            var lightSphere03 = BABYLON.Mesh.CreateSphere("sphere03", 10, 2, scene);
+            lightSphere03.position = light03.position;
+            lightSphere03.material = new BABYLON.StandardMaterial("light03", scene);
+            lightSphere03.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+*/
+            // light04
+            var light04 = new BABYLON.SpotLight("spot04", new BABYLON.Vector3(-125, 120, -125), new BABYLON.Vector3(1, -2, 1), 1.1, 16, scene);
+            light04.intensity = 1;
+
+            var lightSphere04 = BABYLON.Mesh.CreateSphere("sphere04", 10, 2, scene);
+            lightSphere04.position = light04.position;
+            lightSphere04.material = new BABYLON.StandardMaterial("light04", scene);
+            lightSphere04.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+
+
+            //enable physics
+            var gravityVector = new BABYLON.Vector3(0, -9.81, 0);
+            var physicsPlugin = new BABYLON.CannonJSPlugin();
+            scene.enablePhysics(gravityVector, physicsPlugin);
+
+            // Sphere
+            // Our built-in 'sphere' shape. Params: name, subdivs, size, scene
+            var sphere = BABYLON.Mesh.CreateSphere("sphere1", 16, 1, scene);
+            //sphere.position.y = 1;
+            var materialSphere = new BABYLON.StandardMaterial("texture1", scene);
+            materialSphere.diffuseTexture = new BABYLON.Texture("textures/ball.jpeg", scene);
+            //Applying materials
+            sphere.material = materialSphere;
+
+            // Move the sphere upward 1/2 its height
+            var x0 = -5;
+            var y0 = 1.7;
+            sphere.position.x = x0;
+            sphere.position.y = y0;
+
+            sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 1, friction: 155.2, restitution: 0.9 }, scene);
+
+            // Ground
+            var sizex = 250;
+            var sizey = 250;
+            var positionz = 0;
+            // Our built-in 'ground' shape. Params: name, width, depth, subdivs, scene
+            var ground = BABYLON.Mesh.CreateGround("ground1", sizex, sizey , 2, scene);
+            var materialGround = new BABYLON.StandardMaterial("texture2", scene);
+            //materialGround.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7);  //Gray
+            materialGround.diffuseTexture = new BABYLON.Texture("textures/grass.jpeg", scene);
+            materialGround.diffuseTexture.uScale = 50.0;//Repeat 5 times on the Vertical Axes
+            materialGround.diffuseTexture.vScale = 50.0;//Repeat 5 times on the Horizontal Axes
+            //Applying materials
+            ground.material = materialGround;
+            ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, friction: 155.2, restitution: 0.9 }, scene);
+
+
+            // Hoop
+            var hoop = BABYLON.Mesh.CreateTorus("torus", 15, 5, 32, scene);
+            var materialHoop = new BABYLON.StandardMaterial("texture3", scene);
+            materialHoop.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+            materialHoop.specularColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+            materialHoop.emissiveColor = BABYLON.Color3.Red();
+            hoop.material = materialHoop;
+            hoop.physicsImpostor   = new BABYLON.PhysicsImpostor(hoop, BABYLON.PhysicsImpostor.MeshImpostor, { mass: 0, friction: 155.2, restitution: 0.9 }, scene);
+
+            // position initial
+            hoop.position.y = 10;
+            hoop.position.z = 15;
+            hoop.position.x = -3;
+            hoop.rotation.x =  Math.PI / 2;
+
+            allowedImpulse = true;
+            impulse = new BABYLON.Vector3(0, 10, 10);
+
+            // Repere qui indique la direction et la puissance du tir:
+            origin = new BABYLON.Vector3(-10, 2, -10);
+            // repere x
+            var axis_x = BABYLON.MeshBuilder.CreateLines("axis_x", {points: [origin, new BABYLON.Vector3(impulse.x/10.0 + origin.x, origin.y , origin.z) ], updatable: true}, scene);
+            axis_x.color = new BABYLON.Color3(1, 0, 0);
+
+            // repere y
+            var axis_y = BABYLON.MeshBuilder.CreateLines("axis_y", {points: [origin, new BABYLON.Vector3(origin.x, impulse.y/10.0 + origin.y , origin.z) ], updatable: true}, scene);
+            axis_y.color = new BABYLON.Color3(0, 1, 0);
+
+            // repere z
+            var axis_z = BABYLON.MeshBuilder.CreateLines("axis_z", {points: [origin, new BABYLON.Vector3( origin.x, origin.y , impulse.z/10.0 +origin.z) ], updatable: true}, scene);
+            axis_z.color = new BABYLON.Color3(0, 0, 1);
+
+
+           // Shadow ball
+            var shadowGenerator01 = new BABYLON.ShadowGenerator(512, light01);
+            shadowGenerator01.getShadowMap().renderList.push(sphere);
+            shadowGenerator01.getShadowMap().renderList.push(hoop);
+            shadowGenerator01.useVarianceShadowMap = true;
+/*
+            var shadowGenerator02 = new BABYLON.ShadowGenerator(512, light02);
+            shadowGenerator02.getShadowMap().renderList.push(sphere);
+            shadowGenerator02.getShadowMap().renderList.push(hoop);
+            shadowGenerator02.useVarianceShadowMap = true;
+
+            var shadowGenerator03 = new BABYLON.ShadowGenerator(512, light03);
+            shadowGenerator03.getShadowMap().renderList.push(sphere);
+            shadowGenerator03.getShadowMap().renderList.push(hoop);
+            shadowGenerator03.useVarianceShadowMap = true;
+*/
+            var shadowGenerator04 = new BABYLON.ShadowGenerator(512, light04);
+            shadowGenerator04.getShadowMap().renderList.push(sphere);
+            shadowGenerator04.getShadowMap().renderList.push(hoop);
+            shadowGenerator04.useVarianceShadowMap = true;
+
+
+
+            ground.receiveShadows = true;
+
+
+            window.addEventListener("keydown", function (evt) {
+                // Press backspace key put the ball to initial position
+                if (evt.keyCode == 8) {
+
+                    sphere.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,0,0));
+                    sphere.physicsImpostor.setAngularVelocity(new BABYLON.Quaternion(0,0,0,0));
+                    sphere.position = new BABYLON.Vector3(x0,y0,0);
+
+                    // reset variables
+                    allowedImpulse = true;
+
+                }
+                // Press space key to fire
+                if (evt.keyCode == 32) {
+                    if (allowedImpulse == true)
+                    {
+                        sphere.physicsImpostor.applyImpulse(new BABYLON.Vector3(impulse.x, impulse.y, impulse.z), sphere.getAbsolutePosition());
+                        allowedImpulse = false;
+                    }
+                }
+
+                // Press left arrow
+                if (evt.keyCode == 37) {
+                    impulse.x -= 1;
+                    axis_x = BABYLON.MeshBuilder.CreateLines("axis_x", {points: [origin, new BABYLON.Vector3(impulse.x/10.0 + origin.x, origin.y, origin.z)], instance: axis_x} );
+                }
+                    // Press up arrow
+                if (evt.keyCode == 38) {
+                    impulse.y += 1;
+                    axis_y = BABYLON.MeshBuilder.CreateLines("axis_y", {points: [origin, new BABYLON.Vector3( origin.x, impulse.y/10.0 +origin.y, origin.z)], instance: axis_y} );
+                }
+                    // Press right arrow
+                if (evt.keyCode == 39) {
+                    impulse.x += 1;
+                    axis_x = BABYLON.MeshBuilder.CreateLines("axis_x", {points: [origin, new BABYLON.Vector3(impulse.x/10.0 + origin.x, origin.y, origin.z)], instance: axis_x} );
+                }
+                    // Press down arrow
+                if (evt.keyCode == 40) {
+                    impulse.y -= 1;
+                    axis_y = BABYLON.MeshBuilder.CreateLines("axis_y", {points: [origin, new BABYLON.Vector3( origin.x, impulse.y/10.0 +origin.y, origin.z)], instance: axis_y} );
+                }
+
+                // Press a key => increase power
+                if (evt.keyCode == 65) {
+                    impulse.z += 1;
+                    axis_z = BABYLON.MeshBuilder.CreateLines("axis_z", {points: [origin, new BABYLON.Vector3( origin.x, origin.y, impulse.z/10.0 + origin.z)], instance: axis_z} );
+                }
+                    // Press z key => decrease power
+                if (evt.keyCode == 90) {
+                    impulse.z -= 1;
+                    axis_z = BABYLON.MeshBuilder.CreateLines("axis_z", {points: [origin, new BABYLON.Vector3( origin.x, origin.y, impulse.z/10.0 + origin.z)], instance: axis_z} );
+                }
+
+                // Press number key => change hoop position
+                // 0 initial position
+                if (evt.keyCode == 48) {
+                    hoop.position.y = 10;
+                    hoop.position.z = 15;
+                    hoop.position.x = -3;
+                }
+                // 1
+                if (evt.keyCode == 49) {
+                    hoop.position.y = 10;
+                    hoop.position.z = 30;
+                    hoop.position.x = -3;
+                }
+                // 2
+                if (evt.keyCode == 50) {
+                    hoop.position.y = 10;
+                    hoop.position.z = 60;
+                    hoop.position.x = -3;
+                }
+                // 3
+                if (evt.keyCode == 51) {
+                    hoop.position.y = 30;
+                    hoop.position.z = 50;
+                    hoop.position.x = -15;
+                }
+                // 4
+                if (evt.keyCode == 52) {
+                    hoop.position.y = 20;
+                    hoop.position.z = 95;
+                    hoop.position.x = 9;
+                }
+                // 5
+                if (evt.keyCode == 53) {
+                    hoop.position.y = 40;
+                    hoop.position.z = 75;
+                    hoop.position.x = 25;
+                }
+            });
+
+            return scene;
+
+        };
+
+    function webGLStart() {
+
+        var canvas = document.getElementById("renderCanvas");
+        var engine = new BABYLON.Engine(canvas, true);
+
+        var scene = createScene(engine, canvas);
+
+        engine.runRenderLoop(function () {
+        scene.render();
+        });
+
+    }
+    </script>
+    </head>
+
+<body onload="webGLStart();">
+<canvas id="renderCanvas"></canvas>
+</body>
+</html>
