@@ -1,6 +1,6 @@
 ##WEBGL - BABYLON
 
-* Simon Ziza et Guillaume Emery*
+* Simon Ziza et Guillaume Emery
 
 **Introduction :**
 
